@@ -5,7 +5,7 @@ const commands = [
   new SlashCommandBuilder()
     .setName("react")
     .setDescription("Replies with a ReactBot reaction")
-    .setDMPermission(true)
+    .setContexts([0, 1, 2])
     .toJSON()
 ]
 
