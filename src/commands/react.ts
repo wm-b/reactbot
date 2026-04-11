@@ -1,8 +1,21 @@
-import { CommandInteraction, CommandInteractionResolvedData } from "discord.js"
+import { CacheType, ChatInputCommandInteraction } from "discord.js"
 import fs from "fs"
 import path from "path"
+import { reactionMap } from "../utils/map.js"
+import { sanitiseString } from "../utils/strings.js"
 
-const getReactionUrl = () => {
+const command = (interaction: ChatInputCommandInteraction<CacheType>) => {
+  const searchTerm = interaction.options.getString("search")?.trim()
+  if (!searchTerm)
+    return interaction.reply({
+      content: getRandomReactionUrl() || "No reactions available"
+    })
+  return interaction.reply({
+    content: getReactionFromTerm(searchTerm) || "No matching reactions found"
+  })
+}
+
+const getRandomReactionUrl = () => {
   const files = fs
     .readdirSync(process.env.REACTIONS_DIR!)
     .filter((f) =>
@@ -13,11 +26,22 @@ const getReactionUrl = () => {
   return `${process.env.BASE_URL}/${encodeURIComponent(randomFile)}`
 }
 
-const command = (interaction: CommandInteraction) => {
-  const reactionUrl = getReactionUrl()
-  if (!reactionUrl)
-    return interaction.reply({ content: "No reactions available" })
-  interaction.reply({ content: reactionUrl })
+const getReactionFromTerm = (term: string): string | null => {
+  const sanitisedTerm = sanitiseString(term)
+
+  const exactMatchId = Object.entries(reactionMap).find(
+    ([, name]) => sanitiseString(name) === sanitisedTerm
+  )?.[0]
+  if (exactMatchId) return `${process.env.BASE_URL}/${exactMatchId}.webm`
+  const matchingReactionIds = Object.entries(reactionMap).filter(([, name]) =>
+    sanitiseString(name).includes(sanitisedTerm)
+  )
+  if (!matchingReactionIds.length) return null
+  const reactionId =
+    matchingReactionIds[
+      Math.floor(Math.random() * matchingReactionIds.length)
+    ][0]
+  return `${process.env.BASE_URL}/${reactionId}.webm`
 }
 
 export default command

@@ -5,6 +5,12 @@ const commands = [
   new SlashCommandBuilder()
     .setName("react")
     .setDescription("Replies with a ReactBot reaction")
+    .addStringOption((option) =>
+      option
+        .setName("search")
+        .setDescription("Search term to find a specific reaction")
+        .setRequired(false)
+    )
     .setContexts([0, 1, 2])
     .toJSON()
 ]
