@@ -7,10 +7,28 @@ const commands = [
     .setDescription("Replies with a ReactBot reaction")
     .addStringOption((option) =>
       option
-        .setName("search")
+        .setName("term")
         .setDescription("Search term to find a specific reaction")
         .setRequired(false)
+        .setAutocomplete(true)
     )
+    .setContexts([0, 1, 2])
+    .toJSON(),
+  new SlashCommandBuilder()
+    .setName("reactinfo")
+    .setDescription("Preview a reaction and see its usage stats")
+    .addStringOption((option) =>
+      option
+        .setName("name")
+        .setDescription("Name of the reaction")
+        .setRequired(true)
+        .setAutocomplete(true)
+    )
+    .setContexts([0, 1, 2])
+    .toJSON(),
+  new SlashCommandBuilder()
+    .setName("reacttop")
+    .setDescription("List the top 10 most used reactions")
     .setContexts([0, 1, 2])
     .toJSON()
 ]
